@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server/server.js",
   "keywords": [
-    "StrongLoop",
+    "StrongLoop Labs",
     "LoopBack",
     "oAuth 2.0",
     "gateway",
