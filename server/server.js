@@ -16,12 +16,12 @@ var httpsOptions = {
 var app = module.exports = loopback();
 
 // Set up the /favicon.ico
-app.use(loopback.favicon());
+app.middleware('initial', loopback.favicon());
 
 // request pre-processing middleware
-app.use(loopback.compress());
+app.middleware('initial', loopback.compress());
 
-app.use(loopback.session({ saveUninitialized: true,
+app.middleware('session', loopback.session({ saveUninitialized: true,
   resave: true, secret: 'keyboard cat' }));
 
 // -- Add your pre-processing middleware here --
@@ -31,9 +31,9 @@ boot(app, __dirname);
 
 // Redirect http requests to https
 var httpsPort = app.get('https-port');
-app.use(httpsRedirect({httpsPort: httpsPort}));
+app.middleware('routes', httpsRedirect({httpsPort: httpsPort}));
 
-var oauth2 = require('loopback-component-oauth2').oAuth2Provider(
+var oauth2 = require('loopback-component-oauth2')(
   app, {
     dataSource: app.dataSources.db, // Data source for oAuth2 metadata persistence
     loginPage: '/login', // The login page url
@@ -43,19 +43,15 @@ var oauth2 = require('loopback-component-oauth2').oAuth2Provider(
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// -- Mount static files here--
-// All static middleware should be registered at the end, as all requests
-// passing the static middleware are hitting the file system
-// Example:
-//   app.use(loopback.static(path.resolve(__dirname', '../client')));
-
-oauth2.authenticate(['/protected', '/api', '/me'], {session: false, scope: 'demo'});
-
 // Set up login/logout forms
 app.get('/login', site.loginForm);
 
 app.get('/logout', site.logout);
 app.get('/account', site.account);
+app.get('/callback', site.callbackPage);
+
+var auth = oauth2.authenticate({session: false, scope: 'demo'});
+app.use(['/protected', '/api', '/me'], auth);
 
 app.get('/me', function(req, res, next) {
   // req.authInfo is set using the `info` argument supplied by
@@ -66,28 +62,27 @@ app.get('/me', function(req, res, next) {
     accessToken: req.authInfo.accessToken });
 });
 
-app.get('/callback', site.callbackPage);
-
-app.use(loopback.static(path.join(__dirname, '../client/public')));
-
-app.use('/admin', loopback.static(path.join(__dirname, '../client/admin')));
-
 signupTestUserAndApp();
 
 var rateLimiting = require('./middleware/rate-limiting');
-app.use(rateLimiting({limit: 100, interval: 60000}));
+app.middleware('routes:after', rateLimiting({limit: 100, interval: 60000}));
 
 var proxy = require('./middleware/proxy');
 var proxyOptions = require('./middleware/proxy/config.json');
-app.use(proxy(proxyOptions));
+app.middleware('routes:after', proxy(proxyOptions));
+
+app.middleware('files',
+  loopback.static(path.join(__dirname, '../client/public')));
+app.middleware('files', '/admin',
+  loopback.static(path.join(__dirname, '../client/admin')));
 
 // Requests that get this far won't be handled
 // by any middleware. Convert them into a 404 error
 // that will be handled later down the chain.
-app.use(loopback.urlNotFound());
+app.middleware('final', loopback.urlNotFound());
 
 // The ultimate error handler.
-app.use(loopback.errorHandler());
+app.middleware('final', loopback.errorHandler());
 
 app.start = function() {
   var port = app.get('port');
