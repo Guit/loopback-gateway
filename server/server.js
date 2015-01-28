@@ -51,7 +51,7 @@ app.get('/account', site.account);
 app.get('/callback', site.callbackPage);
 
 var auth = oauth2.authenticate({session: false, scope: 'demo'});
-app.use(['/protected', '/api', '/me'], auth);
+app.use(['/protected', '/api', '/me', '/_internal'], auth);
 
 app.get('/me', function(req, res, next) {
   // req.authInfo is set using the `info` argument supplied by
