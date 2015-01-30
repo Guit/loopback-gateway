@@ -1,12 +1,12 @@
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 
-var http = require('http')
-  , https = require('https')
-  , path = require('path')
-  , httpsRedirect = require('./middleware/https-redirect')
-  , site = require('./site')
-  , sslCert = require('./private/ssl_cert');
+var http = require('http');
+var https = require('https');
+var path = require('path');
+var httpsRedirect = require('./middleware/https-redirect');
+var site = require('./site');
+var sslCert = require('./private/ssl_cert');
 
 var httpsOptions = {
   key: sslCert.privateKey,
@@ -35,7 +35,8 @@ app.middleware('routes', httpsRedirect({httpsPort: httpsPort}));
 
 var oauth2 = require('loopback-component-oauth2')(
   app, {
-    dataSource: app.dataSources.db, // Data source for oAuth2 metadata persistence
+    // Data source for oAuth2 metadata persistence
+    dataSource: app.dataSources.db,
     loginPage: '/login', // The login page url
     loginPath: '/login' // The login processing url
   });
@@ -53,12 +54,12 @@ app.get('/callback', site.callbackPage);
 var auth = oauth2.authenticate({session: false, scope: 'demo'});
 app.use(['/protected', '/api', '/me', '/_internal'], auth);
 
-app.get('/me', function(req, res, next) {
+app.get('/me', function(req, res) {
   // req.authInfo is set using the `info` argument supplied by
   // `BearerStrategy`.  It is typically used to indicate scope of the token,
   // and used in access control checks.  For illustrative purposes, this
   // example simply returns the scope in the response.
-  res.json({ user_id: req.user.id, name: req.user.username,
+  res.json({ 'user_id': req.user.id, name: req.user.username,
     accessToken: req.authInfo.accessToken });
 });
 

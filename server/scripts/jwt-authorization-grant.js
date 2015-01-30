@@ -16,7 +16,7 @@ var body = {
   header: { alg: 'RS256' },
   privateKey: sslCerts.privateKey,
   payload: payload
-}
+};
 
 var assertion = jwt.sign(body);
 
@@ -26,11 +26,12 @@ var code = process.argv[2];
 console.log('code: ', code);
 
 var form = {
-  grant_type: 'authorization_code',
+  'grant_type': 'authorization_code',
   code: code || 'invalid_code_123',
-  client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-  client_assertion: assertion
-}
+  'client_assertion_type':
+    'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
+  'client_assertion': assertion
+};
 
 var request = require('request');
 request.post({

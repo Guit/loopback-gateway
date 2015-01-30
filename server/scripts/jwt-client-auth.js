@@ -19,7 +19,7 @@ var body = {
   header: { alg: 'RS256' },
   privateKey: sslCerts.privateKey,
   payload: payload
-}
+};
 
 // Create a JWT assertion
 var assertion = jwt.sign(body);
@@ -27,9 +27,9 @@ var assertion = jwt.sign(body);
 console.log(assertion);
 
 var form = {
-  grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+  'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
   assertion: assertion
-}
+};
 
 var request = require('request');
 request.post({

@@ -47,7 +47,7 @@ function createProxy(options) {
   options = options || {};
   var router = options.router;
 
-  var handler = function(req, res, next) {
+  var handler = function(req, res) {
     var target = options.target || 'http://localhost:3002/';
     if (typeof router === 'function') {
       target = router(req);
@@ -60,7 +60,9 @@ function createProxy(options) {
   return handler;
 }
 
-// Folked from https://github.com/tinganho/connect-modrewrite/blob/master/index.js (MIT License)
+// Folked from
+// https://github.com/tinganho/connect-modrewrite/blob/master/index.js
+// (MIT License)
 /**
  * Module dependencies
  */
@@ -71,16 +73,16 @@ var url = require('url');
  * Syntaxes
  */
 
-var noCaseSyntax = /NC/
-  , lastSyntax = /L/
-  , proxySyntax = /P/
-  , redirectSyntax = /R=?(\d+)?/
-  , forbiddenSyntax = /F/
-  , goneSyntax = /G/
-  , typeSyntax = /T=([\w|\/]+,?)/
-  , hostSyntax = /H=([^,]+)/
-  , flagSyntax = /\[(.*)\]$/
-  , partsSyntax = /\s+|\t+/g
+var noCaseSyntax = /NC/;
+var lastSyntax = /L/;
+var proxySyntax = /P/;
+var redirectSyntax = /R=?(\d+)?/;
+var forbiddenSyntax = /F/;
+var goneSyntax = /G/;
+var typeSyntax = /T=([\w|\/]+,?)/;
+var hostSyntax = /H=([^,]+)/;
+var flagSyntax = /\[(.*)\]$/;
+var partsSyntax = /\s+|\t+/g;
 
 function urlRewrite(rules) {
 // Parse the rules to get flags, replace and match pattern
@@ -204,9 +206,9 @@ function _parse(rules) {
       parts[0] = parts[0].substr(1);
     }
 
-    var redirectValue = redirectSyntax.exec(flags)
-      , typeValue = typeSyntax.exec(flags)
-      , hostValue = hostSyntax.exec(flags);
+    var redirectValue = redirectSyntax.exec(flags);
+    var typeValue = typeSyntax.exec(flags);
+    var hostValue = hostSyntax.exec(flags);
 
     return {
       regexp: typeof parts[2] !== 'undefined' && noCaseSyntax.test(flags) ?
