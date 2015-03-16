@@ -47,5 +47,8 @@
   "license": {
     "name": "Dual Artistic-2.0/StrongLoop",
     "url": "https://github.com/strongloop/loopback-gateway/blob/master/LICENSE"
+  },
+  "devDependencies": {
+    "jshint": "^2.6.3"
   }
 }
