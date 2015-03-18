@@ -33,13 +33,13 @@ boot(app, __dirname);
 var httpsPort = app.get('https-port');
 app.middleware('routes', httpsRedirect({httpsPort: httpsPort}));
 
-var oauth2 = require('loopback-component-oauth2')(
-  app, {
-    // Data source for oAuth2 metadata persistence
-    dataSource: app.dataSources.db,
-    loginPage: '/login', // The login page url
-    loginPath: '/login' // The login processing url
-  });
+var oauth2 = require('loopback-component-oauth2');
+oauth2(app, {
+  // Data source for oAuth2 metadata persistence
+  dataSource: app.dataSources.db,
+  loginPage: '/login', // The login page url
+  loginPath: '/login' // The login processing url
+});
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -52,7 +52,7 @@ app.get('/account', site.account);
 app.get('/callback', site.callbackPage);
 
 var auth = oauth2.authenticate({session: false, scope: 'demo'});
-app.use(['/protected', '/api', '/me', '/_internal'], auth);
+app.middleware('auth:before', ['/protected', '/api', '/me', '/_internal'], auth);
 
 app.get('/me', function(req, res) {
   // req.authInfo is set using the `info` argument supplied by
