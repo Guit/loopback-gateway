@@ -52,7 +52,8 @@ app.get('/account', site.account);
 app.get('/callback', site.callbackPage);
 
 var auth = oauth2.authenticate({session: false, scope: 'demo'});
-app.middleware('auth:before', ['/protected', '/api', '/me', '/_internal'], auth);
+app.middleware('auth:before', ['/protected', '/api', '/me', '/_internal'],
+  auth);
 
 app.get('/me', function(req, res) {
   // req.authInfo is set using the `info` argument supplied by
