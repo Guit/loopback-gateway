@@ -115,14 +115,15 @@ function signupTestUserAndApp() {
         user.username, 'secret');
     }
 
+    var appModel = app.loopback.getModelByType(app.models.Application);
     // Hack to set the app id to a fixed value so that we don't have to change
     // the client settings
-    app.models.Application.beforeSave = function(next) {
+    appModel.beforeSave = function(next) {
       this.id = 123;
       this.restApiKey = 'secret';
       next();
     };
-    app.models.Application.register(
+    appModel.register(
       user.id,
       'demo-app',
       {
